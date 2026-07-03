@@ -3,47 +3,6 @@ services:
     image: ghcr.io/gitroomhq/postiz-app:latest
     container_name: postiz
     restart: always
-    environment:
-      MAIN_URL: 'https://postiz.bwpm.pro'
-      FRONTEND_URL: 'https://postiz.bwpm.pro'
-      NEXT_PUBLIC_BACKEND_URL: 'https://postiz.bwpm.pro/api'
-      JWT_SECRET: 'xxDZUPxtlBh+UzEFoGEZpYO1RvKWIKvPE8ol7bdGyjthdQPbNqLTo0wf27rjSdmo0T4qoUG4qxF8l9QCltCzzA=='
-      DATABASE_URL: 'postgresql://postiz-user:postiz-password@postiz-postgres:5432/postiz-db-local'
-      REDIS_URL: 'redis://postiz-redis:6379'
-      BACKEND_INTERNAL_URL: 'http://localhost:3000'
-      TEMPORAL_ADDRESS: 'temporal:7233'
-      IS_GENERAL: 'true'
-      DISABLE_REGISTRATION: 'false'
-      RUN_CRON: 'true'
-      STORAGE_PROVIDER: 'local'
-      UPLOAD_DIRECTORY: '/uploads'
-      NEXT_PUBLIC_UPLOAD_DIRECTORY: '/uploads'
-      X_API_KEY: ''
-      X_API_SECRET: ''
-      LINKEDIN_CLIENT_ID: ''
-      LINKEDIN_CLIENT_SECRET: ''
-      FACEBOOK_APP_ID: ''
-      FACEBOOK_APP_SECRET: ''
-      YOUTUBE_CLIENT_ID: ''
-      YOUTUBE_CLIENT_SECRET: ''
-      TIKTOK_CLIENT_ID: ''
-      TIKTOK_CLIENT_SECRET: ''
-      INSTAGRAM_CLIENT_ID: ''
-      INSTAGRAM_CLIENT_SECRET: ''
-      REDDIT_CLIENT_ID: ''
-      REDDIT_CLIENT_SECRET: ''
-      THREADS_APP_ID: ''
-      THREADS_APP_SECRET: ''
-      DISCORD_CLIENT_ID: ''
-      DISCORD_CLIENT_SECRET: ''
-      DISCORD_BOT_TOKEN_ID: ''
-      SLACK_ID: ''
-      SLACK_SECRET: ''
-      SLACK_SIGNING_SECRET: ''
-      OPENAI_API_KEY: ''
-      API_LIMIT: 30
-      NX_ADD_PLUGINS: false
-      FEE_AMOUNT: 0.05
     volumes:
       - postiz-config:/config/
       - postiz-uploads:/uploads/
