@@ -3,6 +3,24 @@ services:
     image: ghcr.io/gitroomhq/postiz-app:latest
     container_name: postiz
     restart: always
+    environment:
+      MAIN_URL: ${MAIN_URL}
+      FRONTEND_URL: ${FRONTEND_URL}
+      NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      BACKEND_INTERNAL_URL: ${BACKEND_INTERNAL_URL}
+      TEMPORAL_ADDRESS: ${TEMPORAL_ADDRESS}
+      IS_GENERAL: ${IS_GENERAL}
+      DISABLE_REGISTRATION: ${DISABLE_REGISTRATION}
+      RUN_CRON: ${RUN_CRON}
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER}
+      UPLOAD_DIRECTORY: ${UPLOAD_DIRECTORY}
+      NEXT_PUBLIC_UPLOAD_DIRECTORY: ${NEXT_PUBLIC_UPLOAD_DIRECTORY}
+      NX_ADD_PLUGINS: ${NX_ADD_PLUGINS}
+      API_LIMIT: ${API_LIMIT}
+      FEE_AMOUNT: ${FEE_AMOUNT}
     volumes:
       - postiz-config:/config/
       - postiz-uploads:/uploads/
@@ -138,4 +156,3 @@ networks:
   temporal-network:
     driver: bridge
     name: temporal-network
-
