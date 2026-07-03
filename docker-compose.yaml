@@ -117,12 +117,13 @@ services:
     networks:
       - postiz-network
       - temporal-network
-    healthcheck:
-      test: ["CMD", "node", "-e", "const r=require('http').get('http://localhost:5000/',res=>process.exit(res.statusCode<500?0:1));r.on('error',()=>process.exit(1));r.setTimeout(4000,()=>{r.destroy();process.exit(1)})"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 120s
+        healthcheck:
+      test: ["CMD", "temporal", "operator", "cluster", "health", "--address", "temporal:7233"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 300s
+
     depends_on:
       postiz-postgres:
         condition: service_healthy
