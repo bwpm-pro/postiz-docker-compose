@@ -4,63 +4,46 @@ services:
     container_name: postiz
     restart: always
     environment:
-      # === Required Settings
-      MAIN_URL: 'https://postiz.bwcube.com'         # ← Cambia a tu dominio real
-      FRONTEND_URL: 'https://postiz.bwcube.com'     # ← Cambia a tu dominio real
-      NEXT_PUBLIC_BACKEND_URL: 'https://postiz.bwcube.com/api'
-      JWT_SECRET: 'CHANGE_ME_TO_RANDOM_64_CHARS'    # ← Genera con: openssl rand -base64 64
+      MAIN_URL: 'https://postiz.bwpm.pro'
+      FRONTEND_URL: 'https://postiz.bwpm.pro'
+      NEXT_PUBLIC_BACKEND_URL: 'https://postiz.bwpm.pro/api'
+      JWT_SECRET: 'xxDZUPxtlBh+UzEFoGEZpYO1RvKWIKvPE8ol7bdGyjthdQPbNqLTo0wf27rjSdmo0T4qoUG4qxF8l9QCltCzzA=='
       DATABASE_URL: 'postgresql://postiz-user:postiz-password@postiz-postgres:5432/postiz-db-local'
       REDIS_URL: 'redis://postiz-redis:6379'
       BACKEND_INTERNAL_URL: 'http://localhost:3000'
-      TEMPORAL_ADDRESS: "temporal:7233"
+      TEMPORAL_ADDRESS: 'temporal:7233'
       IS_GENERAL: 'true'
       DISABLE_REGISTRATION: 'false'
       RUN_CRON: 'true'
-
-      # === Storage Settings
       STORAGE_PROVIDER: 'local'
       UPLOAD_DIRECTORY: '/uploads'
       NEXT_PUBLIC_UPLOAD_DIRECTORY: '/uploads'
-
-      # === Social Media API Settings (fill as needed)
       X_API_KEY: ''
       X_API_SECRET: ''
       LINKEDIN_CLIENT_ID: ''
       LINKEDIN_CLIENT_SECRET: ''
-      REDDIT_CLIENT_ID: ''
-      REDDIT_CLIENT_SECRET: ''
-      GITHUB_CLIENT_ID: ''
-      GITHUB_CLIENT_SECRET: ''
-      BEEHIIVE_API_KEY: ''
-      BEEHIIVE_PUBLICATION_ID: ''
-      THREADS_APP_ID: ''
-      THREADS_APP_SECRET: ''
       FACEBOOK_APP_ID: ''
       FACEBOOK_APP_SECRET: ''
       YOUTUBE_CLIENT_ID: ''
       YOUTUBE_CLIENT_SECRET: ''
       TIKTOK_CLIENT_ID: ''
       TIKTOK_CLIENT_SECRET: ''
-      PINTEREST_CLIENT_ID: ''
-      PINTEREST_CLIENT_SECRET: ''
-      DRIBBBLE_CLIENT_ID: ''
-      DRIBBBLE_CLIENT_SECRET: ''
+      INSTAGRAM_CLIENT_ID: ''
+      INSTAGRAM_CLIENT_SECRET: ''
+      REDDIT_CLIENT_ID: ''
+      REDDIT_CLIENT_SECRET: ''
+      THREADS_APP_ID: ''
+      THREADS_APP_SECRET: ''
       DISCORD_CLIENT_ID: ''
       DISCORD_CLIENT_SECRET: ''
       DISCORD_BOT_TOKEN_ID: ''
       SLACK_ID: ''
       SLACK_SECRET: ''
       SLACK_SIGNING_SECRET: ''
-      MASTODON_URL: 'https://mastodon.social'
-      MASTODON_CLIENT_ID: ''
-      MASTODON_CLIENT_SECRET: ''
-
-      # === Misc Settings
       OPENAI_API_KEY: ''
       API_LIMIT: 30
       NX_ADD_PLUGINS: false
       FEE_AMOUNT: 0.05
-
     volumes:
       - postiz-config:/config/
       - postiz-uploads:/uploads/
@@ -117,9 +100,6 @@ services:
     networks:
       - postiz-network
 
-  # -----------------------
-  # Temporal Stack (sin Elasticsearch — más liviano y estable)
-  # -----------------------
   temporal-postgresql:
     container_name: temporal-postgresql
     image: postgres:16
@@ -155,7 +135,6 @@ services:
       - POSTGRES_USER=temporal
       - POSTGRES_PWD=temporal
       - POSTGRES_SEEDS=temporal-postgresql
-      # Elasticsearch DESACTIVADO — no es necesario para Postiz
       - ENABLE_ES=false
       - TEMPORAL_NAMESPACE=default
     networks:
@@ -200,4 +179,3 @@ networks:
   temporal-network:
     driver: bridge
     name: temporal-network
-
