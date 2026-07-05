@@ -208,7 +208,7 @@ services:
     networks:
       - temporal-network
     ports:
-      - '8080:8080'
+      - '8085:8080'
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
       interval: 30s
@@ -230,4 +230,3 @@ networks:
     driver: bridge
   temporal-network:
     driver: bridge
-
