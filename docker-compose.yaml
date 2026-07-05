@@ -106,12 +106,9 @@ services:
       retries: 10
       start_period: 180s
     depends_on:
-      postiz-postgres:
-        condition: service_healthy
-      postiz-redis:
-        condition: service_healthy
-      temporal:
-        condition: service_healthy
+      - postiz-postgres
+      - postiz-redis
+      - temporal
 
   postiz-postgres:
     image: postgres:17-alpine
@@ -184,8 +181,7 @@ services:
       - '7233:7233'
     image: temporalio/auto-setup:1.28.1
     depends_on:
-      temporal-postgresql:
-        condition: service_healthy
+      - temporal-postgresql
     environment:
       - DB=postgres12
       - DB_PORT=5432
@@ -220,8 +216,7 @@ services:
       retries: 5
       start_period: 20s
     depends_on:
-      temporal:
-        condition: service_healthy
+      - temporal
 
 volumes:
   postgres-volume:
