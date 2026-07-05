@@ -1,26 +1,96 @@
 services:
   postiz:
     image: ghcr.io/gitroomhq/postiz-app:latest
-    container_name: postiz
     restart: always
     environment:
-      MAIN_URL: ${MAIN_URL}
-      FRONTEND_URL: ${FRONTEND_URL}
-      NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
-      JWT_SECRET: ${JWT_SECRET}
-      DATABASE_URL: ${DATABASE_URL}
-      REDIS_URL: ${REDIS_URL}
-      BACKEND_INTERNAL_URL: ${BACKEND_INTERNAL_URL}
-      TEMPORAL_ADDRESS: ${TEMPORAL_ADDRESS}
-      IS_GENERAL: ${IS_GENERAL}
-      DISABLE_REGISTRATION: ${DISABLE_REGISTRATION}
-      RUN_CRON: ${RUN_CRON}
-      STORAGE_PROVIDER: ${STORAGE_PROVIDER}
-      UPLOAD_DIRECTORY: ${UPLOAD_DIRECTORY}
-      NEXT_PUBLIC_UPLOAD_DIRECTORY: ${NEXT_PUBLIC_UPLOAD_DIRECTORY}
-      NX_ADD_PLUGINS: ${NX_ADD_PLUGINS}
-      API_LIMIT: ${API_LIMIT}
-      FEE_AMOUNT: ${FEE_AMOUNT}
+      # === Required Settings
+      MAIN_URL: 'http://localhost:4007'
+      FRONTEND_URL: 'http://localhost:4007'
+      NEXT_PUBLIC_BACKEND_URL: 'http://localhost:4007/api'
+      JWT_SECRET: 'random string that is unique to every install - just type random characters here!'
+      DATABASE_URL: 'postgresql://postiz-user:postiz-password@postiz-postgres:5432/postiz-db-local'
+      REDIS_URL: 'redis://postiz-redis:6379'
+      BACKEND_INTERNAL_URL: 'http://localhost:3000'
+      TEMPORAL_ADDRESS: 'temporal:7233'
+      IS_GENERAL: 'true'
+      DISABLE_REGISTRATION: 'false'
+      RUN_CRON: 'true'
+
+      # === Storage Settings
+      STORAGE_PROVIDER: 'local'
+      UPLOAD_DIRECTORY: '/uploads'
+      NEXT_PUBLIC_UPLOAD_DIRECTORY: '/uploads'
+
+      # === Cloudflare (R2) Settings
+      # STORAGE_PROVIDER: 'cloudflare'
+      # CLOUDFLARE_ACCOUNT_ID: 'your-account-id'
+      # CLOUDFLARE_ACCESS_KEY: 'your-access-key'
+      # CLOUDFLARE_SECRET_ACCESS_KEY: 'your-secret-access-key'
+      # CLOUDFLARE_BUCKETNAME: 'your-bucket-name'
+      # CLOUDFLARE_BUCKET_URL: 'https://your-bucket-url.r2.cloudflarestorage.com/'
+      # CLOUDFLARE_REGION: 'auto'
+
+      # === Social Media API Settings
+      X_API_KEY: ''
+      X_API_SECRET: ''
+      LINKEDIN_CLIENT_ID: ''
+      LINKEDIN_CLIENT_SECRET: ''
+      REDDIT_CLIENT_ID: ''
+      REDDIT_CLIENT_SECRET: ''
+      GITHUB_CLIENT_ID: ''
+      GITHUB_CLIENT_SECRET: ''
+      BEEHIIVE_API_KEY: ''
+      BEEHIIVE_PUBLICATION_ID: ''
+      THREADS_APP_ID: ''
+      THREADS_APP_SECRET: ''
+      FACEBOOK_APP_ID: ''
+      FACEBOOK_APP_SECRET: ''
+      YOUTUBE_CLIENT_ID: ''
+      YOUTUBE_CLIENT_SECRET: ''
+      TIKTOK_CLIENT_ID: ''
+      TIKTOK_CLIENT_SECRET: ''
+      PINTEREST_CLIENT_ID: ''
+      PINTEREST_CLIENT_SECRET: ''
+      DRIBBBLE_CLIENT_ID: ''
+      DRIBBBLE_CLIENT_SECRET: ''
+      DISCORD_CLIENT_ID: ''
+      DISCORD_CLIENT_SECRET: ''
+      DISCORD_BOT_TOKEN_ID: ''
+      SLACK_ID: ''
+      SLACK_SECRET: ''
+      SLACK_SIGNING_SECRET: ''
+      MASTODON_URL: 'https://mastodon.social'
+      MASTODON_CLIENT_ID: ''
+      MASTODON_CLIENT_SECRET: ''
+
+      # === OAuth & Authentik Settings
+      # NEXT_PUBLIC_POSTIZ_OAUTH_DISPLAY_NAME: 'Authentik'
+      # NEXT_PUBLIC_POSTIZ_OAUTH_LOGO_URL: 'https://raw.githubusercontent.com/walkxcode/dashboard-icons/master/png/authentik.png'
+      # POSTIZ_GENERIC_OAUTH: 'false'
+      # POSTIZ_OAUTH_URL: 'https://auth.example.com'
+      # POSTIZ_OAUTH_AUTH_URL: 'https://auth.example.com/application/o/authorize'
+      # POSTIZ_OAUTH_TOKEN_URL: 'https://auth.example.com/application/o/token'
+      # POSTIZ_OAUTH_USERINFO_URL: 'https://authentik.example.com/application/o/userinfo'
+      # POSTIZ_OAUTH_CLIENT_ID: ''
+      # POSTIZ_OAUTH_CLIENT_SECRET: ''
+      # POSTIZ_OAUTH_SCOPE: "openid profile email"
+
+      # === Misc Settings
+      OPENAI_API_KEY: ''
+      NEXT_PUBLIC_DISCORD_SUPPORT: ''
+      NEXT_PUBLIC_POLOTNO: ''
+      API_LIMIT: 30
+
+      # === Payment / Stripe Settings
+      FEE_AMOUNT: 0.05
+      STRIPE_PUBLISHABLE_KEY: ''
+      STRIPE_SECRET_KEY: ''
+      STRIPE_SIGNING_KEY: ''
+      STRIPE_SIGNING_KEY_CONNECT: ''
+
+      # === Developer Settings
+      NX_ADD_PLUGINS: false
+
     volumes:
       - postiz-config:/config/
       - postiz-uploads:/uploads/
@@ -33,8 +103,8 @@ services:
       test: ["CMD", "node", "-e", "const r=require('http').get('http://localhost:5000/',res=>process.exit(res.statusCode<500?0:1));r.on('error',()=>process.exit(1));r.setTimeout(4000,()=>{r.destroy();process.exit(1)})"]
       interval: 30s
       timeout: 10s
-      retries: 5
-      start_period: 120s
+      retries: 10
+      start_period: 180s
     depends_on:
       postiz-postgres:
         condition: service_healthy
@@ -45,7 +115,6 @@ services:
 
   postiz-postgres:
     image: postgres:17-alpine
-    container_name: postiz-postgres
     restart: always
     environment:
       POSTGRES_PASSWORD: postiz-password
@@ -64,7 +133,6 @@ services:
 
   postiz-redis:
     image: redis:7.2
-    container_name: postiz-redis
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
@@ -77,8 +145,21 @@ services:
     networks:
       - postiz-network
 
+  # For Application Monitoring / Debugging
+  spotlight:
+    profiles: [debug]
+    pull_policy: always
+    restart: unless-stopped
+    ports:
+      - 8969:8969/tcp
+    image: ghcr.io/getsentry/spotlight:latest
+    networks:
+      - postiz-network
+
+  # -----------------------
+  # Temporal Stack (lean — no Elasticsearch, no admin-tools)
+  # -----------------------
   temporal-postgresql:
-    container_name: temporal-postgresql
     image: postgres:16
     restart: always
     environment:
@@ -98,7 +179,6 @@ services:
       - temporal-postgres-data:/var/lib/postgresql/data
 
   temporal:
-    container_name: temporal
     restart: always
     ports:
       - '7233:7233'
@@ -121,10 +201,9 @@ services:
       interval: 15s
       timeout: 10s
       retries: 20
-      start_period: 60s
+      start_period: 90s
 
   temporal-ui:
-    container_name: temporal-ui
     image: temporalio/ui:2.34.0
     restart: always
     environment:
@@ -134,25 +213,26 @@ services:
       - temporal-network
     ports:
       - '8080:8080'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     depends_on:
       temporal:
         condition: service_healthy
 
 volumes:
   postgres-volume:
-    external: false
   postiz-redis-data:
-    external: false
   postiz-config:
-    external: false
   postiz-uploads:
-    external: false
   temporal-postgres-data:
-    external: false
 
 networks:
   postiz-network:
-    external: false
+    driver: bridge
   temporal-network:
     driver: bridge
-    name: temporal-network
+
